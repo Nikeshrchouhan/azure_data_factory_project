@@ -1,0 +1,15 @@
+{
+	"name": "first-adf-nil",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "westus3",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "21d04792-4c81-4e0e-a3ee-c9d9c8f9c9c1",
+		"tenantId": "24458397-f74e-4c58-b6a1-347c07f6924b"
+	}
+}

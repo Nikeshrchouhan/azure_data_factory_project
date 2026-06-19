@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "Azure_sql_target_table",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "adf_to_azure_sql_server_linked_service",

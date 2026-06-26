@@ -1,0 +1,14 @@
+{
+	"name": "adf_to_syanapse_sql_pool_linked_service",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"server": "air-bnb-synapse-workspace.sql.azuresynapse.net",
+			"database": "airBnbSynapseDwh",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SystemAssignedManagedIdentity"
+		}
+	}
+}

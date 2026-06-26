@@ -1,0 +1,485 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "first-adf-nil"
+		},
+		"adf_to_azure_sql_server_linked_service_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'adf_to_azure_sql_server_linked_service'"
+		},
+		"adls_to_adf_linked_service_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'adls_to_adf_linked_service'"
+		},
+		"cosmos_db_to_adf_liked_service_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'cosmos_db_to_adf_liked_service'"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "first-sql-logical-server-nil.database.windows.net"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "first-database-nil"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "nil-admin"
+		},
+		"adls_to_adf_linked_service_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlsstoragenil.dfs.core.windows.net/"
+		},
+		"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "air-bnb-synapse-workspace.sql.azuresynapse.net"
+		},
+		"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "airBnbSynapseDwh"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Azure_sql_target_table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_to_azure_sql_server_linked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "YEAR_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MONTH_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TotalSales",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "sales_mart",
+					"table": "SalesAggregate"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adf_to_azure_sql_server_linked_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adls_sales_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adls_to_adf_linked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "adf-source"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adls_to_adf_linked_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adf_to_azure_sql_server_linked_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('adf_to_azure_sql_server_linked_service_properties_typeProperties_server')]",
+					"database": "[parameters('adf_to_azure_sql_server_linked_service_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('adf_to_azure_sql_server_linked_service_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('adf_to_azure_sql_server_linked_service_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adls_to_adf_linked_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('adls_to_adf_linked_service_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('adls_to_adf_linked_service_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cosmos_db_to_adf_liked_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": "[parameters('cosmos_db_to_adf_liked_service_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adf_to_syanapse_sql_pool_linked_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"server": "[parameters('adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_server')]",
+					"database": "[parameters('adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SystemAssignedManagedIdentity"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/costomer_raw_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adls_to_adf_linked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "customers-raw-data",
+						"fileSystem": "air-bnb"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adls_to_adf_linked_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/customer_data_archive_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adls_to_adf_linked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "customers-data-archive",
+						"fileSystem": "air-bnb"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adls_to_adf_linked_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/booking_data_cosmos_source_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cosmos_db_to_adf_liked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": "bookings"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cosmos_db_to_adf_liked_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/customer_dim_synapse_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_to_syanapse_sql_pool_linked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "first_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "last_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "email",
+						"type": "nvarchar"
+					},
+					{
+						"name": "phone_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "address",
+						"type": "nvarchar"
+					},
+					{
+						"name": "city",
+						"type": "nvarchar"
+					},
+					{
+						"name": "state",
+						"type": "nvarchar"
+					},
+					{
+						"name": "country",
+						"type": "nvarchar"
+					},
+					{
+						"name": "zip_code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "signup_date",
+						"type": "date"
+					},
+					{
+						"name": "last_login",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "total_bookings",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "total_spent",
+						"type": "decimal",
+						"precision": 14,
+						"scale": 2
+					},
+					{
+						"name": "preferred_language",
+						"type": "nvarchar"
+					},
+					{
+						"name": "referral_code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "account_status",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "airbnb",
+					"table": "dim_customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adf_to_syanapse_sql_pool_linked_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/booking_fact_synapse_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adf_to_syanapse_sql_pool_linked_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "booking_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "customer_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "listing_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "booking_created_at",
+						"type": "date"
+					},
+					{
+						"name": "checkin_date",
+						"type": "date"
+					},
+					{
+						"name": "checkout_date",
+						"type": "date"
+					},
+					{
+						"name": "nights",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "lead_time_days",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "guests_adults",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "guests_children",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "guests_infants",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "price_nightly",
+						"type": "decimal",
+						"precision": 12,
+						"scale": 2
+					},
+					{
+						"name": "cleaning_fee",
+						"type": "decimal",
+						"precision": 12,
+						"scale": 2
+					},
+					{
+						"name": "total_amount",
+						"type": "decimal",
+						"precision": 14,
+						"scale": 2
+					},
+					{
+						"name": "currency",
+						"type": "nvarchar"
+					},
+					{
+						"name": "country_code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "city",
+						"type": "nvarchar"
+					},
+					{
+						"name": "channel",
+						"type": "nvarchar"
+					},
+					{
+						"name": "device_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cancellation_ts",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "cancellation_reason",
+						"type": "nvarchar"
+					},
+					{
+						"name": "updated_at",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "airbnb",
+					"table": "fact_booking"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adf_to_syanapse_sql_pool_linked_service')]"
+			]
+		}
+	]
+}

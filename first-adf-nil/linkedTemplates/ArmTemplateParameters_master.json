@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "first-adf-nil"
+		},
+		"adf_to_azure_sql_server_linked_service_password": {
+			"value": ""
+		},
+		"adls_to_adf_linked_service_accountKey": {
+			"value": ""
+		},
+		"cosmos_db_to_adf_liked_service_connectionString": {
+			"value": ""
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_server": {
+			"value": "first-sql-logical-server-nil.database.windows.net"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_database": {
+			"value": "first-database-nil"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_userName": {
+			"value": "nil-admin"
+		},
+		"adls_to_adf_linked_service_properties_typeProperties_url": {
+			"value": "https://adlsstoragenil.dfs.core.windows.net/"
+		},
+		"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_server": {
+			"value": "air-bnb-synapse-workspace.sql.azuresynapse.net"
+		},
+		"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_database": {
+			"value": "airBnbSynapseDwh"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

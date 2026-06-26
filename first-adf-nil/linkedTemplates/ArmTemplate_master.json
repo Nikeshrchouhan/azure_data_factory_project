@@ -1,0 +1,105 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "first-adf-nil"
+		},
+		"adf_to_azure_sql_server_linked_service_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'adf_to_azure_sql_server_linked_service'"
+		},
+		"adls_to_adf_linked_service_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'adls_to_adf_linked_service'"
+		},
+		"cosmos_db_to_adf_liked_service_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'cosmos_db_to_adf_liked_service'"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "first-sql-logical-server-nil.database.windows.net"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "first-database-nil"
+		},
+		"adf_to_azure_sql_server_linked_service_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "nil-admin"
+		},
+		"adls_to_adf_linked_service_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlsstoragenil.dfs.core.windows.net/"
+		},
+		"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "air-bnb-synapse-workspace.sql.azuresynapse.net"
+		},
+		"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "airBnbSynapseDwh"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "first-adf-nil_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"adf_to_azure_sql_server_linked_service_password": {
+						"value": "[parameters('adf_to_azure_sql_server_linked_service_password')]"
+					},
+					"adls_to_adf_linked_service_accountKey": {
+						"value": "[parameters('adls_to_adf_linked_service_accountKey')]"
+					},
+					"cosmos_db_to_adf_liked_service_connectionString": {
+						"value": "[parameters('cosmos_db_to_adf_liked_service_connectionString')]"
+					},
+					"adf_to_azure_sql_server_linked_service_properties_typeProperties_server": {
+						"value": "[parameters('adf_to_azure_sql_server_linked_service_properties_typeProperties_server')]"
+					},
+					"adf_to_azure_sql_server_linked_service_properties_typeProperties_database": {
+						"value": "[parameters('adf_to_azure_sql_server_linked_service_properties_typeProperties_database')]"
+					},
+					"adf_to_azure_sql_server_linked_service_properties_typeProperties_userName": {
+						"value": "[parameters('adf_to_azure_sql_server_linked_service_properties_typeProperties_userName')]"
+					},
+					"adls_to_adf_linked_service_properties_typeProperties_url": {
+						"value": "[parameters('adls_to_adf_linked_service_properties_typeProperties_url')]"
+					},
+					"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_server": {
+						"value": "[parameters('adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_server')]"
+					},
+					"adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_database": {
+						"value": "[parameters('adf_to_syanapse_sql_pool_linked_service_properties_typeProperties_database')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

@@ -1,0 +1,15 @@
+{
+	"name": "booking_data_cosmos_source_dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "cosmos_db_to_adf_liked_service",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {},
+		"typeProperties": {
+			"collectionName": "bookings"
+		}
+	}
+}

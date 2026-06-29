@@ -13,13 +13,19 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "splitGoodAndBad"
+				}
+			],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     enableChangeFeed: true,",
 				"     changeFeedStartFromTheBeginning: true,",
-				"     format: 'document') ~> bookingsSourceoCosmosdb"
+				"     format: 'document') ~> bookingsSourceoCosmosdb",
+				"bookingsSourceoCosmosdb split(checkout < checkin_date,",
+				"     disjoint: true) ~> splitGoodAndBad@(BadRecords, acceptedRecords)"
 			]
 		}
 	}

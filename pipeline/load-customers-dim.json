@@ -83,7 +83,7 @@
 									"writeBehavior": "Upsert",
 									"upsertSettings": {
 										"keys": [
-											""
+											"customer_id"
 										],
 										"interimSchemaName": ""
 									},
@@ -206,10 +206,14 @@
 									"referenceName": "costomer_raw_dataset",
 									"type": "DatasetReference"
 								},
-								"enableLogging": true,
+								"enableLogging": false,
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true,
+									"wildcardFileName": {
+										"value": "@item().name",
+										"type": "Expression"
+									},
 									"enablePartitionDiscovery": false
 								}
 							}

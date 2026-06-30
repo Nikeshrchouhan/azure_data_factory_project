@@ -10,22 +10,86 @@
 						"type": "DatasetReference"
 					},
 					"name": "bookingsSourceoCosmosdb"
+				},
+				{
+					"dataset": {
+						"referenceName": "customer_dim_synapse_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "SynapseBookingFact"
 				}
 			],
 			"sinks": [],
 			"transformations": [
 				{
 					"name": "splitGoodAndBad"
+				},
+				{
+					"name": "lookupForInsertAndUpdateFlag"
 				}
 			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          city as string,",
+				"          channel as string,",
+				"          nights as short,",
+				"          checkout_date as date,",
+				"          customer_id as short,",
+				"          guests_adults as short,",
+				"          listing_id as integer,",
+				"          checkin_date as date,",
+				"          booking_created_at as string,",
+				"          device_type as string,",
+				"          country_code as string,",
+				"          cancellation_reason as string,",
+				"          lead_time_days as short,",
+				"          booking_id as string,",
+				"          price_nightly as double,",
+				"          guests_infants as integer,",
+				"          status as string,",
+				"          guests_children as integer,",
+				"          currency as string,",
+				"          total_amount as double,",
+				"          updated_at as string,",
+				"          cancellation_ts as string,",
+				"          cleaning_fee as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     enableChangeFeed: true,",
 				"     changeFeedStartFromTheBeginning: true,",
 				"     format: 'document') ~> bookingsSourceoCosmosdb",
-				"bookingsSourceoCosmosdb split(checkout < checkin_date,",
-				"     disjoint: true) ~> splitGoodAndBad@(BadRecords, acceptedRecords)"
+				"source(output(",
+				"          customer_id as integer,",
+				"          first_name as string,",
+				"          last_name as string,",
+				"          email as string,",
+				"          phone_number as string,",
+				"          address as string,",
+				"          city as string,",
+				"          state as string,",
+				"          country as string,",
+				"          zip_code as string,",
+				"          signup_date as date,",
+				"          last_login as timestamp,",
+				"          total_bookings as integer,",
+				"          total_spent as decimal(14,2),",
+				"          preferred_language as string,",
+				"          referral_code as string,",
+				"          account_status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table',",
+				"     staged: true) ~> SynapseBookingFact",
+				"bookingsSourceoCosmosdb split(checkout_date < checkin_date,",
+				"     disjoint: true) ~> splitGoodAndBad@(BadRecords, acceptedRecords)",
+				"splitGoodAndBad@acceptedRecords, SynapseBookingFact lookup(booking_id == ERROR_FUNCTION(''),",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     desc(ERROR_FUNCTION(''), true),",
+				"     broadcast: 'auto')~> lookupForInsertAndUpdateFlag"
 			]
 		}
 	}
